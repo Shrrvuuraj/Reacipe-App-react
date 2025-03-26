@@ -1,9 +1,9 @@
-
+import "tailwindcss"
 
 const Recipe = (props) =>{
 
     return <div >
-        <h1>{props.recipeList.recipe.label}</h1>
+        <h1 className="flex" >{props.recipeList.recipe.label}</h1>
         <ol>
             {(props.recipeList.recipe.ingredients).map(list=> <li>{list.text}</li>)}
         </ol>
