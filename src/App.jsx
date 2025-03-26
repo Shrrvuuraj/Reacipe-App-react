@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import Recipe from "./Recipe";
 
-function App() {
-  const [count, setCount] = useState(0)
+const APP_ID = 'dc34792b';
+const APP_KEY = '3eab1a651f78f58e8b394f905f3efa21';
+
+const App = () => {
+  const [input, setInput] = useState('');
+  const [query, setQuery] = useState('');
+  const [dishes, setDishes] = useState([]);
+
+  function submiter(e) {
+    e.preventDefault();
+    setQuery(input);
+  }
+
+  useEffect(() => {
+    async function getRecipe() {
+      try {
+        let res = await fetch(`https://api.edamam.com/search?q=${query}&app_id=${APP_ID}&app_key=${APP_KEY}`);
+        let response = await res.json();
+        setDishes(response.hits || []);
+        console.log(response.hits);
+      } catch (error) {
+        console.error("Error fetching recipes:", error);
+        setDishes([]);
+      }
+    }
+    
+    if (query) {
+      getRecipe();
+    }
+  }, [query]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="main">
+      <form onSubmit={submiter}>
+        <input type="text" onChange={(e) => setInput(e.target.value)} />
+        <button type="submit">submit</button>
+      </form>
+      {dishes.map((item, idx) => (
+        <Recipe key={idx} recipeList={item} />
+      ))}
+    </div>
+  );
+};
 
-export default App
+export default App;
